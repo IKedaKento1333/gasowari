@@ -356,18 +356,27 @@ $("addvia").addEventListener("click",()=>{const n=$("vias").children.length;if(n
   $("vias").appendChild(el);$("addvia").hidden=$("vias").children.length>=5;el.querySelector("input").focus()});
 $("vias").addEventListener("click",e=>{const x=e.target.closest(".x");if(!x)return;x.closest(".via").remove();
   [...$("vias").children].forEach((v,i)=>v.querySelector("label").textContent="経由地"+(i+1));$("addvia").hidden=false});
+// 1台あたりの1日の計算回数を制限（いたずら連打の対策。この端末のブラウザ内だけで数える）
+const RT_LIMIT=20,today=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
+let rtMem={d:today(),n:0};
+function rtUsed(){try{const v=JSON.parse(localStorage.getItem("gasowari_rt")||"null");if(v&&v.d===today()&&v.n>=0)rtMem=v;else if(rtMem.d!==today())rtMem={d:today(),n:0}}catch(e){}return rtMem.d===today()?rtMem.n:0}
+function rtCount(n){rtMem={d:today(),n};try{localStorage.setItem("gasowari_rt",JSON.stringify(rtMem))}catch(e){}}
+const rtLeft=()=>{const l=RT_LIMIT-rtUsed();return l<=5?`（今日はあと${l}回）`:""};
 let busy=false;
 $("rcalc").addEventListener("click",async()=>{if(busy)return;
   const o=$("r0").value.trim(),dst=$("r9").value.trim(),vias=[...document.querySelectorAll(".vi")].map(i=>i.value.trim()).filter(Boolean);
   if(!o||!dst){$("rmsg").textContent="出発地と目的地を入れてね";return}
+  const used=rtUsed();
+  if(used>=RT_LIMIT){$("rmsg").textContent=`距離の自動計算は1日${RT_LIMIT}回までだよ。今日は距離を直接入れてね（明日また使えます）。`;return}
+  rtCount(used+1);
   busy=true;$("rcalc").setAttribute("aria-disabled","true");$("rmsg").textContent="計算中…";
   try{const {Route}=await loadRoutes();
     const req={origin:o,destination:dst,travelMode:"DRIVING",fields:["distanceMeters"]};if(vias.length)req.intermediates=vias;
     const {routes}=await Route.computeRoutes(req);
     const m=routes&&routes[0]&&routes[0].distanceMeters;if(!(m>0))throw new Error("no route");
     const km=Math.round(m/100)/10,path=[o,...vias,dst].join(" → ");
-    if($("multi").checked){$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km。区間ごとに振り分けて入れてね。`}
-    else{$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km を入れたよ。帰りも同じ道なら「往復」を押してね。`;calc()}
+    if($("multi").checked){$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km。区間ごとに振り分けて入れてね。${rtLeft()}`}
+    else{$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km を入れたよ。帰りも同じ道なら「往復」を押してね。${rtLeft()}`;calc()}
   }catch(e){console.warn(e);$("rmsg").textContent="距離を出せませんでした。地名を詳しくするか、距離を直接入れてね。"}
   finally{busy=false;$("rcalc").removeAttribute("aria-disabled")}});
 }
