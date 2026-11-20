@@ -278,7 +278,15 @@ $("plus").addEventListener("click",()=>{S.ppl=Math.min(10,S.ppl+1);calc()});
 for(const id of["dist","eco","price","toll","park","who"])$(id).addEventListener("input",calc);
 $("free").addEventListener("change",calc);
 
-let msg="";
+let msg="",touched=false,calcTracked=false;
+const SITE="https://ikedakento1333.github.io/gasowari/";
+const shareText=src=>msg+SITE+"?utm_source="+src+"&utm_medium=share";
+// ---- アクセス計測（GA4。IDが空なら何も送らない） ----
+const GA_ID="";
+function track(name,params){try{if(window.gtag)gtag("event",name,params||{})}catch(e){}}
+if(GA_ID){const g=document.createElement("script");g.async=true;g.src="https://www.googletagmanager.com/gtag/js?id="+GA_ID;document.head.appendChild(g);
+  window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config",GA_ID)}
+for(const t of["input","click","change"])$("form").addEventListener(t,()=>{touched=true},true);
 function calc(){
   $("ppl").textContent=S.ppl;
   const multi=$("multi").checked,eco=num($("eco"));
@@ -317,15 +325,16 @@ function calc(){
   $("odd").textContent=odd>=1?`集まるのは ${yen(per*payers)}。おつり ${yen(odd)} は次の休憩のジュース代にでも。`:"ぴったり割り切れました。";
   const who=$("who").value.trim().slice(0,20);
   const gasLine=multi?`ガソリン ${yen(gas)}（${legs.map(l=>`${l.d}km・${l.where}で給油`).join("／")}）`:`ガソリン ${yen(gas)}（${d.toLocaleString("ja-JP")}km${S.trip===2?"・往復":""}）`;
-  msg=`🚗 ドライブおつかれ！\n${gasLine}${toll?`\n高速代 ${yen(toll)}`:""}${park?`\n駐車場代 ${yen(park)}`:""}\n合計 ${yen(total)} ÷ ${payers}人${free?"（ドライバーは無料）":""}\n👉 1人 ${yen(per)} でお願い！${who?`\n支払い先：${who}`:""}\n\nガソ割で計算したよ`;
-  $("lineb").href="https://line.me/R/share?text="+encodeURIComponent(msg);
+  msg=`🚗 ドライブおつかれ！\n${gasLine}${toll?`\n高速代 ${yen(toll)}`:""}${park?`\n駐車場代 ${yen(park)}`:""}\n合計 ${yen(total)} ÷ ${payers}人${free?"（ドライバーは無料）":""}\n👉 1人 ${yen(per)} でお願い！${who?`\n支払い先：${who}`:""}\n\nガソ割で計算したよ👇\n`;
+  $("lineb").href="https://line.me/R/share?text="+encodeURIComponent(shareText("line"));
+  if(touched&&!calcTracked){calcTracked=true;track("calc_done",{multi:multi,driver_free:free,people:S.ppl})}
   save();
 }
 function save(){if(!ready)return;try{localStorage.setItem("gasowari",JSON.stringify({pref:$("pref").value,eco:$("eco").value,type:S.type,ppl:S.ppl,rnd:S.rnd,free:$("free").checked,
   dist:$("dist").value,trip:S.trip,fuel:S.fuel,toll:$("toll").value,park:$("park").value,who:$("who").value,price:$("price").dataset.manual?$("price").value:"",
   multi:$("multi").checked,legs:[...$("legs").children].map(l=>({d:l.querySelector(".ld").value,pref:l.querySelector(".lp").value,price:l.querySelector(".lpr").value,m:!!l.querySelector(".lpr").dataset.manual}))}))}catch(e){}}
-$("copyb").addEventListener("click",async()=>{if(!msg)return;try{await navigator.clipboard.writeText(msg);$("copied").textContent="コピーしました。LINEやメッセージに貼り付けてね"}catch(e){$("copied").textContent="コピーできませんでした。「LINEで送る」を使ってね"}});
-$("lineb").addEventListener("click",e=>{if(!msg)e.preventDefault()});
+$("copyb").addEventListener("click",async()=>{if(!msg)return;try{await navigator.clipboard.writeText(shareText("copy"));track("copy_text");$("copied").textContent="コピーしました。LINEやメッセージに貼り付けてね"}catch(e){$("copied").textContent="コピーできませんでした。「LINEで送る」を使ってね"}});
+$("lineb").addEventListener("click",e=>{if(!msg){e.preventDefault();return}track("line_share")});
 
 // 前回の入力を復元（壊れた値は無視）
 {const st=store,str=v=>typeof v==="string"?v.slice(0,20):"";
@@ -367,17 +376,18 @@ $("rcalc").addEventListener("click",async()=>{if(busy)return;
   const o=$("r0").value.trim(),dst=$("r9").value.trim(),vias=[...document.querySelectorAll(".vi")].map(i=>i.value.trim()).filter(Boolean);
   if(!o||!dst){$("rmsg").textContent="出発地と目的地を入れてね";return}
   const used=rtUsed();
-  if(used>=RT_LIMIT){$("rmsg").textContent=`距離の自動計算は1日${RT_LIMIT}回までだよ。今日は距離を直接入れてね（明日また使えます）。`;return}
+  if(used>=RT_LIMIT){track("map_limit");$("rmsg").textContent=`距離の自動計算は1日${RT_LIMIT}回までだよ。今日は距離を直接入れてね（明日また使えます）。`;return}
   rtCount(used+1);
   busy=true;$("rcalc").setAttribute("aria-disabled","true");$("rmsg").textContent="計算中…";
   try{const {Route}=await loadRoutes();
     const req={origin:o,destination:dst,travelMode:"DRIVING",fields:["distanceMeters"]};if(vias.length)req.intermediates=vias;
     const {routes}=await Route.computeRoutes(req);
     const m=routes&&routes[0]&&routes[0].distanceMeters;if(!(m>0))throw new Error("no route");
+    track("map_calc",{ok:true,vias:vias.length});
     const km=Math.round(m/100)/10,path=[o,...vias,dst].join(" → ");
     if($("multi").checked){$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km。区間ごとに振り分けて入れてね。${rtLeft()}`}
     else{$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km を入れたよ。帰りも同じ道なら「往復」を押してね。${rtLeft()}`;calc()}
-  }catch(e){console.warn(e);$("rmsg").textContent="距離を出せませんでした。地名を詳しくするか、距離を直接入れてね。"}
+  }catch(e){console.warn(e);track("map_calc",{ok:false,vias:vias.length});$("rmsg").textContent="距離を出せませんでした。地名を詳しくするか、距離を直接入れてね。"}
   finally{busy=false;$("rcalc").removeAttribute("aria-disabled")}});
 }
 </script>
