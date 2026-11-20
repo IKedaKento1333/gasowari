@@ -204,6 +204,7 @@ footer p{margin:4px 0;max-width:70ch}
 <div class="bar"><span>1人 <b id="barv">0円</b></span><a href="#res">内訳を見る</a></div>
 
 <footer class="band"><div class="wrap">
+  <p><a href="privacy.html">プライバシーポリシー・免責事項</a></p>
   <p>計算結果は目安です。実際の金額は給油レシートで確認してください。</p>
   <p>ガソリン代などの実費を分け合うためのツールです。実費を超える謝礼を受け取ると、法律上の問題（いわゆる白タク）になる場合があります。</p>
   <p>車種のカタログ燃費（WLTCモード）は代表グレードの目安値です。グレードや駆動方式で変わります。</p>
@@ -282,7 +283,7 @@ let msg="",touched=false,calcTracked=false;
 const SITE="https://ikedakento1333.github.io/gasowari/";
 const shareText=src=>msg+SITE+"?utm_source="+src+"&utm_medium=share";
 // ---- アクセス計測（GA4。IDが空なら何も送らない） ----
-const GA_ID="";
+const GA_ID="G-30WBDKY7MS";
 function track(name,params){try{if(window.gtag)gtag("event",name,params||{})}catch(e){}}
 if(GA_ID){const g=document.createElement("script");g.async=true;g.src="https://www.googletagmanager.com/gtag/js?id="+GA_ID;document.head.appendChild(g);
   window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config",GA_ID)}
