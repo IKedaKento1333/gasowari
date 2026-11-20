@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ガソ割</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: くだけて明るい、でも数字は正確。友だちの車内で使う道具
+   IDEA: 給油機のメーター表示＋レシート
+   PICTURE: 大きな給油メーター風の結果パネル（1人あたり金額がいちばん大きい）
+   COLOUR and TYPE: 給油機イエロー×墨×信号レッド / Dela Gothic One + M PLUS Rounded 1c
+   LAYOUT: 広い画面は入力左・メーター右（追従）。スマホは入力→メーター、下部に金額バー固定 */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#121212);--ink:light-dark(#151515,#f4f4f0);--sub:light-dark(#5b5b5b,#b4b4ad);
+--y:#ffd21f;--yink:#151515;--red:#ff4a2b;--line:light-dark(#e6e6e0,#2c2c2a);--card:light-dark(#f6f6f2,#1c1c1b);
+--meter:#141414;--lcd:#c9ff3d}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "M PLUS Rounded 1c",system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+header.band{background:var(--y);color:var(--yink);padding-bottom:clamp(20px,3vw,36px)}
+.logo{font:400 clamp(44px,8vw,72px)/1.05 "Dela Gothic One",sans-serif;margin:0;letter-spacing:.02em}
+.logo span{color:var(--red)}
+.tag{margin:6px 0 0;font-weight:800;font-size:17px}
+.wrap{max-width:1180px;margin:0 auto}
+main .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:start}
+section.q{border-bottom:1px solid var(--line);padding:20px 0}
+section.q:first-child{padding-top:0}
+h2{font-size:17px;margin:0 0 10px;font-weight:800;display:flex;gap:8px;align-items:baseline}
+h2 small{font-weight:400;color:var(--sub);font-size:13px}
+label{font-size:14px;color:var(--sub);display:block;margin-bottom:4px}
+input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.unit{position:relative}.unit input{padding-right:52px;text-align:right;font-weight:800}
+.unit b{position:absolute;right:12px;bottom:13px;font-size:14px;color:var(--sub);font-weight:400;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-weight:700;font-size:15px;min-height:44px;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip small{font-weight:400;opacity:.75;margin-left:4px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;cursor:pointer;color:var(--ink);font-size:15px;margin:6px 0 0}
+.sw input{appearance:none;width:52px;height:30px;min-height:0;padding:0;border-radius:99px;background:var(--line);border:0;position:relative;flex:none;cursor:pointer;transition:background .2s}
+.sw input::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0004;transition:left .2s}
+.sw input:checked{background:var(--red)}.sw input:checked::after{left:25px}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:48px;height:48px;border-radius:50%;border:2px solid var(--ink);background:var(--bg);color:var(--ink);font:800 24px/1 sans-serif;cursor:pointer}
+.step output{font:400 34px/1 "Dela Gothic One",sans-serif;min-width:2.2em;text-align:center}
+details{margin-top:12px;border:2px dashed var(--line);border-radius:14px;padding:4px 14px}
+summary{cursor:pointer;font-weight:700;min-height:42px;display:flex;align-items:center}
+details[open]{padding-bottom:14px}
+.hint{font-size:13px;color:var(--sub);margin:6px 0 0}
+a{color:inherit}
+.mlink{display:inline-flex;align-items:center;min-height:44px;font-weight:700;font-size:14px}
+/* メーター */
+.meter{position:sticky;top:16px;background:var(--meter);color:#f5f5f0;border-radius:24px;padding:22px clamp(18px,3vw,28px) 24px;box-shadow:0 14px 0 -6px var(--y),0 24px 40px -18px #0008}
+.meter .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#bdbdb5}
+.lamp{width:12px;height:12px;border-radius:50%;background:var(--lcd);box-shadow:0 0 12px var(--lcd)}
+.lcd{margin:12px 0 6px;background:#0a0a0a;border:2px solid #2a2a2a;border-radius:16px;padding:14px 16px;text-align:right}
+.lcd .k{font-size:13px;color:#9a9a92;text-align:left}
+.big{font:400 clamp(46px,7vw,72px)/1.05 "Dela Gothic One",sans-serif;color:var(--lcd);white-space:nowrap}
+.big small{font-size:.38em;margin-left:4px}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.mini div{background:#0a0a0a;border-radius:12px;padding:8px 10px}
+.mini span{display:block;font-size:12px;color:#9a9a92}
+.mini b{font-size:17px;white-space:nowrap}
+.receipt{background:#fbfbf7;color:#222;border-radius:6px;padding:14px 16px;font-size:14px;margin-top:14px;
+  -webkit-mask:radial-gradient(circle 6px at 50% 100%,#0000 98%,#000) 0 0/14px 100% repeat-x;mask:radial-gradient(circle 6px at 50% 100%,#0000 98%,#000) 0 0/14px 100% repeat-x;padding-bottom:22px}
+.receipt table{width:100%;border-collapse:collapse}
+.receipt td{padding:3px 0}.receipt td:last-child{text-align:right;white-space:nowrap}
+.receipt tr.tot td{border-top:1px dashed #999;padding-top:6px;font-weight:800}
+.note{font-size:13px;color:#7a7a70;margin:6px 0 0}
+.btn[aria-disabled=true]{opacity:.4;cursor:not-allowed}
+.warn{color:#ff7a5f;font-weight:700;font-size:14px;margin:8px 0 0}
+.share{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:14px;font:inherit;font-weight:800;font-size:16px;text-decoration:none;cursor:pointer;border:0}
+.line{background:#06c755;color:#fff}.copy{background:var(--y);color:#151515}
+.payee{margin-top:14px}.payee label{color:#bdbdb5}.payee input{background:#0a0a0a;color:#f5f5f0;border-color:#333}
+.leg{display:grid;grid-template-columns:auto minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) 44px;grid-template-areas:"n p d u x";gap:8px;align-items:end;margin-top:10px}
+.leg>b{grid-area:n;font-size:14px;white-space:nowrap;padding-bottom:12px}.leg .lpw{grid-area:p}.leg .ldw{grid-area:d}.leg .lprw{grid-area:u}.leg .x{grid-area:x}
+.leg label{font-size:12px;margin-bottom:2px}
+.x{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:700 18px/1 sans-serif;cursor:pointer}
+@media(max-width:600px){.leg{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;grid-template-areas:"n n x" "p p p" "d u u";padding:10px;border:2px solid var(--line);border-radius:14px;align-items:center}
+ .leg>b{padding-bottom:0}}
+.addleg{margin-top:10px}
+.rt{margin-top:10px}.via{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px;align-items:end;margin-top:10px}
+.rcalc{width:100%;margin-top:12px}#addvia{margin-top:10px}
+.bar{display:none}
+footer{font-size:13px;color:var(--sub);border-top:1px solid var(--line)}
+footer p{margin:4px 0;max-width:70ch}
+@media(max-width:860px){main .wrap{grid-template-columns:minmax(0,1fr)}.meter{position:static}
+ .bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--y);color:#151515;padding:10px 16px calc(10px + env(safe-area-inset-bottom));justify-content:space-between;align-items:center;font-weight:800;box-shadow:0 -6px 20px #0003}
+ .bar b{font:400 28px/1 "Dela Gothic One",sans-serif}.bar a{font-size:14px}
+ body{padding-bottom:76px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <h1 class="logo">ガソ<span>割</span></h1>
+  <p class="tag">楽しかったね、の後は3秒で割り勘。</p>
+</div></header>
+
+<main class="band"><div class="wrap">
+<div id="form">
+  <section class="q">
+    <h2>どれくらい走った？</h2>
+    <div class="row" id="single">
+      <div class="unit"><label for="dist">距離</label><input id="dist" inputmode="decimal" value="120" autocomplete="off"><b>km</b></div>
+      <div><label>片道 / 往復</label><div class="chips" id="trip">
+        <button class="chip" data-v="1" aria-pressed="true">片道</button>
+        <button class="chip" data-v="2" aria-pressed="false">往復 ×2</button></div></div>
+    </div>
+    <label class="sw">途中でも給油した（場所ごとに単価を分ける）<input type="checkbox" id="multi"></label>
+    <div id="multibox" hidden>
+      <p class="hint">区間ごとに、給油した場所と走った距離を入れてね。その場所の単価で計算するよ。例：行き80km（東京で給油）、帰り80km（長野で給油）。<span id="splitnote"></span></p>
+      <div id="legs"></div>
+      <button class="chip addleg" id="addleg">＋ 区間を追加</button>
+    </div>
+    <details id="routebox">
+      <summary>出発地と目的地から距離を出す</summary>
+      <div class="rt"><label for="r0">出発地</label><input id="r0" placeholder="例：新宿駅" maxlength="60"></div>
+      <div id="vias"></div>
+      <button class="chip" id="addvia" type="button">＋ 経由地を追加</button>
+      <div class="rt"><label for="r9">目的地</label><input id="r9" placeholder="例：箱根湯本駅" maxlength="60"></div>
+      <button class="btn copy rcalc" id="rcalc" type="button">距離を計算する</button>
+      <p class="hint" id="rmsg" aria-live="polite"></p>
+    </details>
+  </section>
+
+  <section class="q">
+    <h2>どんな車？ <small>燃費が決まります</small></h2>
+    <div class="chips" id="types"></div>
+    <details id="det">
+      <summary>メーカーと車種で選ぶ（カタログ燃費）</summary>
+      <div class="row">
+        <div><label for="maker">メーカー</label><select id="maker"></select></div>
+        <div><label for="model">車種</label><select id="model"></select></div>
+      </div>
+      <label class="sw">実燃費に近づける（カタログ値×0.8）<input type="checkbox" id="real" checked></label>
+      <p class="hint" id="cat"></p>
+    </details>
+    <div class="row" style="margin-top:12px">
+      <div class="unit"><label for="eco">燃費（手入力もOK）</label><input id="eco" inputmode="decimal" value="18"><b>km/L</b></div>
+    </div>
+  </section>
+
+  <section class="q">
+    <h2 id="fh">どこで給油した？</h2>
+    <div class="row">
+      <div class="sp"><label for="pref">都道府県</label><select id="pref"></select></div>
+      <div><label>油種</label><div class="chips" id="fuel">
+        <button class="chip" data-v="r" aria-pressed="true">レギュラー</button>
+        <button class="chip" data-v="h" aria-pressed="false">ハイオク</button></div></div>
+      <div class="unit sp"><label for="price">単価</label><input id="price" inputmode="decimal"><b>円/L</b></div>
+    </div>
+    <p class="hint">2026年11月16日調査（資源エネルギー庁）の県平均を自動で入れています。レシートの単価に書き換えてOK。ハイオクは全国平均との差（約+11円）で計算しています。</p>
+  </section>
+
+  <section class="q">
+    <h2>何人で乗った？</h2>
+    <div class="step"><button id="minus" aria-label="1人へらす">−</button><output id="ppl">4</output><button id="plus" aria-label="1人ふやす">＋</button><span>人</span></div>
+    <label class="sw">ドライバーは払わない<input type="checkbox" id="free"></label>
+  </section>
+
+  <section class="q">
+    <h2>ほかの費用 <small>任意</small></h2>
+    <div class="row">
+      <div class="unit"><label for="toll">高速代</label><input id="toll" inputmode="numeric" placeholder="0"><b>円</b></div>
+      <div class="unit"><label for="park">駐車場代</label><input id="park" inputmode="numeric" placeholder="0"><b>円</b></div>
+    </div>
+  </section>
+
+  <section class="q">
+    <h2>端数の処理</h2>
+    <div class="chips" id="rnd">
+      <button class="chip" data-v="1" aria-pressed="false">1円単位</button>
+      <button class="chip" data-v="10" aria-pressed="false">10円切り上げ</button>
+      <button class="chip" data-v="100" aria-pressed="true">100円切り上げ</button></div>
+  </section>
+</div>
+
+<aside class="meter" id="res">
+  <div class="top"><span>ガソ割メーター</span><span class="lamp"></span></div>
+  <div class="lcd" aria-live="polite"><div class="k" id="perk">1人あたり</div><div class="big" id="per">0<small>円</small></div></div>
+  <div class="mini">
+    <div><span>給油量</span><b id="lit">0 L</b></div>
+    <div><span>合計</span><b id="tot">0円</b></div>
+    <div><span>払う人</span><b id="pay">0人</b></div>
+  </div>
+  <p class="warn" id="err" hidden></p>
+  <div class="receipt"><table id="rcpt"></table><p class="note" id="odd"></p></div>
+  <div class="payee"><label for="who">支払い先（立て替えた人の名前・任意）</label><input id="who" placeholder="例：たろう"></div>
+  <div class="share">
+    <a class="btn line" id="lineb" href="#" target="_blank" rel="noopener">LINEで送る</a>
+    <button class="btn copy" id="copyb">文面をコピー</button>
+  </div>
+  <p class="note" id="copied" style="color:#bdbdb5"></p>
+</aside>
+</div></main>
+
+<div class="bar"><span>1人 <b id="barv">0円</b></span><a href="#res">内訳を見る</a></div>
+
+<footer class="band"><div class="wrap">
+  <p>計算結果は目安です。実際の金額は給油レシートで確認してください。</p>
+  <p>ガソリン代などの実費を分け合うためのツールです。実費を超える謝礼を受け取ると、法律上の問題（いわゆる白タク）になる場合があります。</p>
+  <p>車種のカタログ燃費（WLTCモード）は代表グレードの目安値です。グレードや駆動方式で変わります。</p>
+</div></footer>
+
+<script>
+{
+const PREF=[["北海道",170.8],["青森",167.2],["岩手",165.1],["宮城",163.1],["秋田",169.0],["山形",177.2],["福島",170.1],["茨城",166.2],["栃木",169.4],["群馬",170.1],["埼玉",164.8],["千葉",167.4],["東京",169.2],["神奈川",167.6],["新潟",171.1],["富山",171.2],["石川",168.7],["福井",174.0],["山梨",168.0],["長野",176.4],["岐阜",169.4],["静岡",171.3],["愛知",163.8],["三重",168.3],["滋賀",170.0],["京都",172.6],["大阪",170.9],["兵庫",166.2],["奈良",167.2],["和歌山",169.2],["鳥取",176.0],["島根",175.0],["岡山",169.0],["広島",168.9],["山口",168.3],["徳島",166.9],["香川",170.6],["愛媛",169.9],["高知",174.2],["福岡",168.0],["佐賀",167.5],["長崎",178.5],["熊本",169.2],["大分",171.3],["宮崎",174.0],["鹿児島",177.9],["沖縄",179.2]];
+const HI=11;
+const TYPES=[["軽",18],["コンパクト",17],["ハイブリッド",23],["ミニバン",12],["SUV",13],["スポーツ・大型",9]];
+const CARS={
+"トヨタ":[["アクア（HV）",33.6],["ヤリス ハイブリッド",36.0],["ヤリス 1.5ガソリン",21.6],["プリウス 1.8（HV）",32.6],["プリウス 2.0（HV）",28.6],["シエンタ ハイブリッド",28.2],["ルーミー",18.4],["ライズ 1.2ガソリン",20.7],["ライズ ハイブリッド",28.0],["カローラクロス ハイブリッド",26.4],["ノア/ヴォクシー ハイブリッド",23.0],["RAV4 ハイブリッド",21.4],["ハリアー ハイブリッド",22.3],["アルファード ハイブリッド",17.5]],
+"ホンダ":[["N-BOX",21.6],["N-WGN",23.2],["フィット e:HEV",28.8],["フリード e:HEV",25.6],["ヴェゼル e:HEV",24.8],["ステップワゴン e:HEV",20.0]],
+"日産":[["デイズ",22.9],["ルークス",20.8],["ノート e-POWER",28.4],["キックス e-POWER",23.0],["セレナ e-POWER",20.6],["エクストレイル e-POWER",19.7]],
+"スズキ":[["アルト ハイブリッド",27.7],["スペーシア ハイブリッド",25.1],["ハスラー ハイブリッド",25.0],["スイフト ハイブリッド",24.5],["ソリオ ハイブリッド",19.6],["ジムニー（AT）",14.3]],
+"ダイハツ":[["ミライース",25.0],["タント",22.7],["ムーヴキャンバス",22.6],["タフト",21.1],["ロッキー e-SMART HYBRID",28.0]],
+"マツダ":[["MAZDA2 1.5ガソリン",19.8],["CX-30 2.0ガソリン",15.4],["CX-5 2.0ガソリン",14.6]],
+"スバル":[["インプレッサ e-BOXER",16.6],["フォレスター e-BOXER",14.0],["レヴォーグ 1.8",13.6]]};
+const $=id=>document.getElementById(id);
+const S={trip:1,type:0,fuel:"r",ppl:4,rnd:100,pref:12};
+const yen=n=>Math.round(n).toLocaleString("ja-JP")+"円";
+const num=el=>{const s=String(el.value).replace(/[０-９．－]/g,c=>c==="－"?"-":String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/[,，円\s]/g,"");if(s==="")return NaN;const v=Number(s);return isFinite(v)?v:NaN};
+const blank=el=>String(el.value).trim()==="";
+let store={};try{store=JSON.parse(localStorage.getItem("gasowari")||"{}")||{}}catch(e){}
+let legsEdited=false,ready=false;
+
+$("types").innerHTML=TYPES.map((t,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===S.type}">${t[0]}<small>${t[1]}</small></button>`).join("");
+$("pref").innerHTML=PREF.map((p,i)=>`<option value="${i}">${p[0]}${i===0?"":p[0]==="東京"?"都":/京都|大阪/.test(p[0])?"府":"県"}</option>`).join("");
+$("maker").innerHTML='<option value="">選んでね</option>'+Object.keys(CARS).map(m=>`<option>${m}</option>`).join("");
+const press=(id,fn)=>{for(const c of $(id).children)c.setAttribute("aria-pressed",fn(c))};
+
+function chipGroup(id,key,cast){$(id).addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;
+  press(id,c=>c===b);S[key]=cast(b.dataset.v);if(key==="fuel")setPrice(false);calc()})}
+chipGroup("trip","trip",Number);chipGroup("rnd","rnd",Number);chipGroup("fuel","fuel",String);
+$("types").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;
+  press("types",c=>c===b);S.type=+b.dataset.i;$("eco").value=TYPES[S.type][1];$("model").value="";$("cat").textContent="";calc()});
+function fillModels(){const m=$("maker").value;$("model").innerHTML='<option value="">選んでね</option>'+(CARS[m]||[]).map((c,i)=>`<option value="${i}">${c[0]}</option>`).join("")}
+function applyModel(){const m=$("maker").value,i=$("model").value;if(!m||i==="")return;const c=CARS[m][+i];
+  const v=$("real").checked?c[1]*0.8:c[1];$("eco").value=v.toFixed(1);
+  $("cat").textContent=`カタログ燃費 ${c[1]} km/L（WLTC）${$("real").checked?"→ 実燃費の目安 "+v.toFixed(1)+" km/L":""}`;
+  S.type=null;press("types",()=>false);calc()}
+$("maker").addEventListener("change",()=>{fillModels();$("cat").textContent=""});
+$("model").addEventListener("change",applyModel);$("real").addEventListener("change",applyModel);
+$("eco").addEventListener("input",()=>{S.type=null;press("types",()=>false)});
+
+const unitPrice=i=>{const p=PREF[+i][1];return (S.fuel==="h"?p+HI:p).toFixed(1)};
+// 手入力した単価（data-manual）は油種切替で上書きしない
+function setPrice(force){const sp=$("price");if(force||!sp.dataset.manual){sp.value=unitPrice($("pref").value);delete sp.dataset.manual}
+  for(const l of $("legs").children){const p=l.querySelector(".lpr");if(!p.dataset.manual)p.value=unitPrice(l.querySelector(".lp").value)}}
+$("price").addEventListener("input",()=>{$("price").dataset.manual="1"});
+function renumber(){const ls=[...$("legs").children];ls.forEach((l,i)=>{l.querySelector(".nm").textContent="区間"+(i+1);l.querySelector(".x").hidden=ls.length<=2});$("addleg").hidden=ls.length>=8}
+function addLeg(d,pi,price,manual){if($("legs").children.length>=8)return;const el=document.createElement("div");el.className="leg";
+  el.innerHTML=`<b class="nm"></b><div class="lpw"><label>給油した場所</label><select class="lp">${$("pref").innerHTML}</select></div><div class="unit ldw"><label>走った距離</label><input class="ld" inputmode="decimal" placeholder="0"><b>km</b></div><div class="unit lprw"><label>単価</label><input class="lpr" inputmode="decimal"><b>円/L</b></div><button class="x" aria-label="この区間を削除">×</button>`;
+  el.querySelector(".ld").value=d||"";el.querySelector(".lp").value=PREF[+pi]?pi:S.pref;
+  el.querySelector(".lpr").value=price||unitPrice(el.querySelector(".lp").value);if(manual)el.querySelector(".lpr").dataset.manual="1";
+  $("legs").appendChild(el);
+  const ls=$("legs").children.length;for(const [c,t] of [[".lp","の給油場所"],[".ld","の距離"],[".lpr","の単価"]])el.querySelector(c).setAttribute("aria-label","区間"+ls+t);
+  renumber()}
+$("legs").addEventListener("input",e=>{legsEdited=true;if(e.target.classList.contains("lpr"))e.target.dataset.manual="1";calc()});
+$("legs").addEventListener("change",e=>{if(e.target.classList.contains("lp")){legsEdited=true;const p=e.target.closest(".leg").querySelector(".lpr");p.value=unitPrice(e.target.value);delete p.dataset.manual;calc()}});
+$("legs").addEventListener("click",e=>{const x=e.target.closest(".x");if(!x)return;x.closest(".leg").remove();legsEdited=true;renumber();calc()});
+$("addleg").addEventListener("click",()=>{const ls=$("legs").children;legsEdited=true;addLeg("",ls.length?ls[ls.length-1].querySelector(".lp").value:$("pref").value);calc()});
+function splitLegs(){$("legs").innerHTML="";const half=num($("dist"))*S.trip/2;const h=half>0?String(Math.round(half*10)/10):"";
+  addLeg(h,$("pref").value);addLeg(h,$("pref").value);$("splitnote").textContent=h?`入力済みの距離を半分ずつ入れておいたよ。`:"";}
+$("multi").addEventListener("change",()=>{const m=$("multi").checked;$("multibox").hidden=!m;$("single").hidden=m;
+  for(const e of document.querySelectorAll(".sp"))e.hidden=m;$("fh").textContent=m?"油種は？":"どこで給油した？";
+  if(m&&(!legsEdited||!$("legs").children.length)){splitLegs();legsEdited=false}
+  calc()});
+$("pref").addEventListener("change",()=>{setPrice(true);calc()});
+$("minus").addEventListener("click",()=>{S.ppl=Math.max(1,S.ppl-1);calc()});
+$("plus").addEventListener("click",()=>{S.ppl=Math.min(10,S.ppl+1);calc()});
+for(const id of["dist","eco","price","toll","park","who"])$(id).addEventListener("input",calc);
+$("free").addEventListener("change",calc);
+
+let msg="";
+function calc(){
+  $("ppl").textContent=S.ppl;
+  const multi=$("multi").checked,eco=num($("eco"));
+  const legs=multi?[...$("legs").children].map((l,i)=>({n:i+1,el:l.querySelector(".ld"),d:num(l.querySelector(".ld")),p:num(l.querySelector(".lpr")),
+      where:l.querySelector(".lp").selectedOptions[0].text})).filter(l=>!blank(l.el))
+    :[{n:1,d:num($("dist"))*S.trip,p:num($("price")),where:$("pref").selectedOptions[0].text}];
+  const toll=blank($("toll"))?0:num($("toll")),park=blank($("park"))?0:num($("park")),free=$("free").checked;
+  const payers=free?S.ppl-1:S.ppl;
+  let err="";const badD=legs.find(l=>!(l.d>=0&&l.d<=20000)),badP=legs.find(l=>!(l.p>50&&l.p<400));
+  const d=legs.reduce((a,l)=>a+(l.d>0?l.d:0),0);
+  if(badD)err=multi?`区間${badD.n}の距離を確認してね`:"距離は0〜20,000 kmの数字で入れてね";
+  else if(!(d>0))err="距離を入れてね";
+  else if(!(eco>=1&&eco<=60))err="燃費は1〜60 km/Lで入れてね";
+  else if(badP)err=multi?`区間${badP.n}の単価を確認してね`:"単価は円/Lで入れてね";
+  else if(!(toll>=0)||!(park>=0))err="高速代・駐車場代は0円以上の数字で入れてね";
+  else if(payers<1)err="ドライバーを除くと払う人がいないよ。人数を増やしてね";
+  $("err").hidden=!err;$("err").textContent=err;
+  const fuelName=S.fuel==="h"?"ハイオク":"レギュラー";
+  const off=v=>{for(const b of[$("lineb"),$("copyb")])b.setAttribute("aria-disabled",v)};
+  if(err){$("per").innerHTML="—<small>円</small>";$("barv").textContent="—円";$("lit").textContent="— L";$("tot").textContent="—円";$("pay").textContent="—";
+    $("rcpt").innerHTML="<tr><td>入力を待っています</td><td></td></tr>";$("odd").textContent="";msg="";$("lineb").href="#";off(true);save();return}
+  off(false);
+  const L=d/eco,gas=legs.reduce((a,l)=>a+l.d/eco*l.p,0),total=gas+toll+park;
+  const raw=total/payers,per=Math.ceil(raw/S.rnd-1e-9)*S.rnd;
+  const gasRows=multi?legs.map(l=>`<tr><td>区間${l.n}：${l.where}で給油・${l.d} km ÷ ${eco} km/L × ${l.p} 円/L</td><td>${yen(l.d/eco*l.p)}</td></tr>`).join("")
+      +`<tr><td>ガソリン代 小計（${d.toLocaleString("ja-JP")} km・${L.toFixed(1)} L・${fuelName}）</td><td>${yen(gas)}</td></tr>`
+    :`<tr><td>距離 ${d.toLocaleString("ja-JP")} km${S.trip===2?"（往復）":""} ÷ 燃費 ${eco} km/L</td><td>${L.toFixed(1)} L</td></tr>
+     <tr><td>× 単価 ${legs[0].p} 円/L（${legs[0].where}・${fuelName}）</td><td>${yen(gas)}</td></tr>`;
+  $("per").innerHTML=Math.round(per).toLocaleString("ja-JP")+"<small>円</small>";
+  $("barv").textContent=yen(per);
+  $("lit").textContent=L.toFixed(1)+" L";$("tot").textContent=yen(total);$("pay").textContent=payers+"人";
+  $("perk").textContent=free?"1人あたり（ドライバー以外）":"1人あたり";
+  $("rcpt").innerHTML=gasRows+(toll?`<tr><td>高速代</td><td>${yen(toll)}</td></tr>`:"")+(park?`<tr><td>駐車場代</td><td>${yen(park)}</td></tr>`:"")
+    +`<tr class="tot"><td>合計 ÷ ${payers}人${free?"（ドライバー無料）":""}</td><td>${yen(raw)}</td></tr>`;
+  const odd=per*payers-total;
+  $("odd").textContent=odd>=1?`集まるのは ${yen(per*payers)}。おつり ${yen(odd)} は次の休憩のジュース代にでも。`:"ぴったり割り切れました。";
+  const who=$("who").value.trim().slice(0,20);
+  const gasLine=multi?`ガソリン ${yen(gas)}（${legs.map(l=>`${l.d}km・${l.where}で給油`).join("／")}）`:`ガソリン ${yen(gas)}（${d.toLocaleString("ja-JP")}km${S.trip===2?"・往復":""}）`;
+  msg=`🚗 ドライブおつかれ！\n${gasLine}${toll?`\n高速代 ${yen(toll)}`:""}${park?`\n駐車場代 ${yen(park)}`:""}\n合計 ${yen(total)} ÷ ${payers}人${free?"（ドライバーは無料）":""}\n👉 1人 ${yen(per)} でお願い！${who?`\n支払い先：${who}`:""}\n\nガソ割で計算したよ`;
+  $("lineb").href="https://line.me/R/share?text="+encodeURIComponent(msg);
+  save();
+}
+function save(){if(!ready)return;try{localStorage.setItem("gasowari",JSON.stringify({pref:$("pref").value,eco:$("eco").value,type:S.type,ppl:S.ppl,rnd:S.rnd,free:$("free").checked,
+  dist:$("dist").value,trip:S.trip,fuel:S.fuel,toll:$("toll").value,park:$("park").value,who:$("who").value,price:$("price").dataset.manual?$("price").value:"",
+  multi:$("multi").checked,legs:[...$("legs").children].map(l=>({d:l.querySelector(".ld").value,pref:l.querySelector(".lp").value,price:l.querySelector(".lpr").value,m:!!l.querySelector(".lpr").dataset.manual}))}))}catch(e){}}
+$("copyb").addEventListener("click",async()=>{if(!msg)return;try{await navigator.clipboard.writeText(msg);$("copied").textContent="コピーしました。LINEやメッセージに貼り付けてね"}catch(e){$("copied").textContent="コピーできませんでした。「LINEで送る」を使ってね"}});
+$("lineb").addEventListener("click",e=>{if(!msg)e.preventDefault()});
+
+// 前回の入力を復元（壊れた値は無視）
+{const st=store,str=v=>typeof v==="string"?v.slice(0,20):"";
+ $("pref").value=st.pref!=null&&PREF[+st.pref]?st.pref:S.pref;
+ if(st.type===null||TYPES[st.type]){S.type=st.type===undefined?0:st.type;press("types",c=>+c.dataset.i===S.type)}
+ $("eco").value=str(st.eco)||TYPES[S.type??0][1];
+ if(st.ppl)S.ppl=Math.min(10,Math.max(1,Math.round(+st.ppl)||4));
+ if([1,10,100].includes(+st.rnd)){S.rnd=+st.rnd;press("rnd",c=>+c.dataset.v===S.rnd)}
+ if([1,2].includes(+st.trip)){S.trip=+st.trip;press("trip",c=>+c.dataset.v===S.trip)}
+ if(st.fuel==="h"||st.fuel==="r"){S.fuel=st.fuel;press("fuel",c=>c.dataset.v===S.fuel)}
+ if(str(st.dist))$("dist").value=str(st.dist);
+ for(const k of["toll","park","who"])if(str(st[k]))$(k).value=str(st[k]);
+ $("free").checked=!!st.free;
+ setPrice(true);if(str(st.price)){$("price").value=str(st.price);$("price").dataset.manual="1"}
+ if(Array.isArray(st.legs)&&st.legs.length){for(const l of st.legs.slice(0,8))addLeg(str(l.d),str(l.pref),str(l.price),!!l.m);legsEdited=true}
+ if(st.multi){$("multi").checked=true;$("multi").dispatchEvent(new Event("change"))}
+}
+ready=true;calc();
+
+// ---- Googleマップで距離計算（ボタンを押したときだけ読み込む） ----
+const GKEY="AIzaSyCuPXm_qn2H8axq8CM8DbVv5anV0mqmKrE";
+let routesLib=null;
+function loadRoutes(){if(routesLib)return routesLib;
+  (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({key:GKEY,v:"weekly",language:"ja",region:"JP"});
+  routesLib=google.maps.importLibrary("routes").catch(e=>{routesLib=null;throw e});return routesLib}
+$("addvia").addEventListener("click",()=>{const n=$("vias").children.length;if(n>=5)return;const el=document.createElement("div");el.className="via";
+  el.innerHTML=`<div><label>経由地${n+1}</label><input class="vi" maxlength="60" placeholder="例：海老名SA"></div><button class="x" type="button" aria-label="この経由地を削除">×</button>`;
+  $("vias").appendChild(el);$("addvia").hidden=$("vias").children.length>=5;el.querySelector("input").focus()});
+$("vias").addEventListener("click",e=>{const x=e.target.closest(".x");if(!x)return;x.closest(".via").remove();
+  [...$("vias").children].forEach((v,i)=>v.querySelector("label").textContent="経由地"+(i+1));$("addvia").hidden=false});
+let busy=false;
+$("rcalc").addEventListener("click",async()=>{if(busy)return;
+  const o=$("r0").value.trim(),dst=$("r9").value.trim(),vias=[...document.querySelectorAll(".vi")].map(i=>i.value.trim()).filter(Boolean);
+  if(!o||!dst){$("rmsg").textContent="出発地と目的地を入れてね";return}
+  busy=true;$("rcalc").setAttribute("aria-disabled","true");$("rmsg").textContent="計算中…";
+  try{const {Route}=await loadRoutes();
+    const req={origin:o,destination:dst,travelMode:"DRIVING",fields:["distanceMeters"]};if(vias.length)req.intermediates=vias;
+    const {routes}=await Route.computeRoutes(req);
+    const m=routes&&routes[0]&&routes[0].distanceMeters;if(!(m>0))throw new Error("no route");
+    const km=Math.round(m/100)/10,path=[o,...vias,dst].join(" → ");
+    if($("multi").checked){$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km。区間ごとに振り分けて入れてね。`}
+    else{$("dist").value=km;$("rmsg").textContent=`${path}：片道 ${km} km を入れたよ。帰りも同じ道なら「往復」を押してね。`;calc()}
+  }catch(e){console.warn(e);$("rmsg").textContent="距離を出せませんでした。地名を詳しくするか、距離を直接入れてね。"}
+  finally{busy=false;$("rcalc").removeAttribute("aria-disabled")}});
+}
+</script>
+</body>
+</html>
