@@ -103,6 +103,12 @@ a{color:inherit}
 .addleg{margin-top:10px}
 .rt{margin-top:10px}.via{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px;align-items:end;margin-top:10px}
 .rcalc{width:100%;margin-top:12px}#addvia{margin-top:10px}
+.pr{margin-top:16px;border:1px solid #333;border-radius:14px;padding:12px 14px;background:#0a0a0a}
+.pr .tag{display:inline-block;font-size:11px;font-weight:800;color:#141414;background:#bdbdb5;border-radius:4px;padding:0 6px;margin-right:6px}
+.pr .lead{font-size:13px;color:#bdbdb5;margin:0 0 6px}
+.pr a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;color:#f5f5f0;font-weight:700;text-decoration:none}
+.pr a::after{content:"→";color:var(--lcd)}
+.pr img.px{position:absolute;width:1px;height:1px;opacity:0}
 .bar{display:none}
 footer{font-size:13px;color:var(--sub);border-top:1px solid var(--line)}
 footer p{margin:4px 0;max-width:70ch}
@@ -214,6 +220,7 @@ footer p{margin:4px 0;max-width:70ch}
     <button class="btn copy" id="copyb">文面をコピー</button>
   </div>
   <p class="note" id="copied" style="color:#bdbdb5"></p>
+  <div class="pr" id="pr" hidden></div>
 </aside>
 </div></main>
 
@@ -297,6 +304,25 @@ for(const id of["dist","eco","price","toll","park","who"])$(id).addEventListener
 $("free").addEventListener("change",calc);
 
 let msg="",touched=false,calcTracked=false;
+// ---- アフィリエイト枠（A8.netのリンクを入れると表示。空なら何も出さない） ----
+// ctx: "toll"=高速代を入れた人向け / "any"=だれでも
+const AFF=[
+  {ctx:"toll",lead:"高速代、ETCカードで払ってる？",label:"ETCカードの申し込みを見る（高速情報協同組合）",href:"https://px.a8.net/svt/ejp?a8mat=4BGR96+8FN3AQ+1WW0+NXESY",px:"https://www18.a8.net/0.gif?a8mat=4BGR96+8FN3AQ+1WW0+NXESY"},
+  {ctx:"any", lead:"次のドライブは高速を使う？",label:"ETCカードの申し込みを見る（高速情報協同組合）",href:"https://px.a8.net/svt/ejp?a8mat=4BGR96+8F1NOY+1WW0+BWVTE",px:"https://www16.a8.net/0.gif?a8mat=4BGR96+8F1NOY+1WW0+BWVTE"},
+  {ctx:"any", lead:"車がないときは",label:"カーシェア・レンタカーを探す",href:"",px:""},
+  {ctx:"any", lead:"ガソリン代をもっと安く",label:"ガソリンが安くなるカードを見る",href:"",px:""}
+].filter(a=>/^https:\/\//.test(a.href));
+let prShown="";
+function showPR(toll){const box=$("pr");if(!AFF.length){box.hidden=true;return}
+  const pool=toll>0&&AFF.some(a=>a.ctx==="toll")?AFF.filter(a=>a.ctx==="toll"):AFF.filter(a=>a.ctx==="any");
+  if(!pool.length){box.hidden=true;return}
+  const key=pool.map(a=>a.href).join();if(prShown===key&&!box.hidden)return;prShown=key;
+  const a=pool[Math.floor(Math.random()*pool.length)];
+  box.innerHTML="";const p=document.createElement("p");p.className="lead";p.innerHTML='<span class="tag">PR</span>';p.append(a.lead);
+  const l=document.createElement("a");l.href=a.href;l.target="_blank";l.rel="nofollow sponsored noopener";l.textContent=a.label;
+  l.addEventListener("click",()=>track("affiliate_click",{item:a.label}));box.append(p,l);
+  if(/^https:\/\//.test(a.px)){const i=new Image(1,1);i.className="px";i.alt="";i.src=a.px;box.append(i)}
+  box.hidden=false}
 const SITE="https://ikedakento1333.github.io/gasowari/";
 const shareText=src=>msg+SITE+"?utm_source="+src+"&utm_medium=share";
 // ---- アクセス計測（GA4。IDが空なら何も送らない） ----
@@ -325,7 +351,7 @@ function calc(){
   const fuelName=S.fuel==="h"?"ハイオク":"レギュラー";
   const off=v=>{for(const b of[$("lineb"),$("copyb")])b.setAttribute("aria-disabled",v)};
   if(err){$("per").innerHTML="—<small>円</small>";$("barv").textContent="—円";$("lit").textContent="— L";$("tot").textContent="—円";$("pay").textContent="—";
-    $("rcpt").innerHTML="<tr><td>入力を待っています</td><td></td></tr>";$("odd").textContent="";msg="";$("lineb").href="#";off(true);save();return}
+    $("rcpt").innerHTML="<tr><td>入力を待っています</td><td></td></tr>";$("odd").textContent="";msg="";$("lineb").href="#";off(true);$("pr").hidden=true;save();return}
   off(false);
   const L=d/eco,gas=legs.reduce((a,l)=>a+l.d/eco*l.p,0),total=gas+toll+park;
   const raw=total/payers,per=Math.ceil(raw/S.rnd-1e-9)*S.rnd;
@@ -345,6 +371,7 @@ function calc(){
   const gasLine=multi?`ガソリン ${yen(gas)}（${legs.map(l=>`${l.d}km・${l.where}で給油`).join("／")}）`:`ガソリン ${yen(gas)}（${d.toLocaleString("ja-JP")}km${S.trip===2?"・往復":""}）`;
   msg=`🚗 ドライブおつかれ！\n${gasLine}${toll?`\n高速代 ${yen(toll)}`:""}${park?`\n駐車場代 ${yen(park)}`:""}\n合計 ${yen(total)} ÷ ${payers}人${free?"（ドライバーは無料）":""}\n👉 1人 ${yen(per)} でお願い！${who?`\n支払い先：${who}`:""}\n\nガソ割で計算したよ👇\n`;
   $("lineb").href="https://line.me/R/share?text="+encodeURIComponent(shareText("line"));
+  showPR(toll);
   if(touched&&!calcTracked){calcTracked=true;track("calc_done",{multi:multi,driver_free:free,people:S.ppl})}
   save();
 }
