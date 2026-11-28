@@ -11,7 +11,7 @@
 <meta property="og:image" content="https://ikedakento1333.github.io/gasowari/ogp.png"><meta name="twitter:card" content="summary_large_image">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-30WBDKY7MS"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-30WBDKY7MS');</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"年末年始の帰省ドライブ、ガソリン代と高速代はどう割る？","datePublished":"2026-11-22","inLanguage":"ja","publisher":{"@type":"Organization","name":"ガソ割"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"年末年始の帰省ドライブ、ガソリン代と高速代はどう割る？","datePublished":"2026-11-27","dateModified":"2026-11-28","inLanguage":"ja","publisher":{"@type":"Organization","name":"ガソ割"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 /* スマホ基準（360px〜）。768px以上で広げる */
@@ -44,7 +44,7 @@ th,td{border-bottom:1px solid var(--line);padding:10px 6px;text-align:left;verti
 th{white-space:nowrap;font-size:13px;color:var(--sub)}td.n{text-align:right;white-space:nowrap}
 div[style*="overflow-x"]{-webkit-overflow-scrolling:touch}
 .cta{display:flex;align-items:center;justify-content:center;min-height:56px;border-radius:16px;background:var(--k);color:var(--y);font-weight:800;font-size:17px;text-decoration:none;margin:28px 0;padding:8px 16px;text-align:center}
-:root:not([data-theme=light]) .cta{outline:2px solid var(--y)}
+:root[data-theme=dark] .cta{outline:2px solid var(--y)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .cta{outline:2px solid var(--y)}}
 .note{font-size:14px;color:var(--sub)}
 .related{margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
 .related h2{background:none;display:block;font-size:17px;margin:0 0 8px}
@@ -76,7 +76,17 @@ footer a{display:inline-block;min-height:40px;padding:8px}
  .dock{left:auto;right:24px;width:360px}
 }
 @media(prefers-reduced-motion:reduce){.dock{transition:none}}
+.answer{border:2px solid var(--k);border-radius:18px;padding:14px 16px;margin:18px 0 8px;background:var(--bg)}
+:root[data-theme=dark] .answer{border-color:var(--y)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .answer{border-color:var(--y)}}
+.answer .q{font-weight:800;margin:0 0 6px;font-size:16px}.answer .q::before{content:"Q. ";color:var(--r)}
+.answer p{margin:0}.answer p+p::before{content:"A. ";font-weight:800;color:var(--r)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;min-height:52px;display:flex;align-items:center;font-weight:800;font-size:16px;line-height:1.5;padding:8px 0}
+.faq summary::marker{color:var(--r)}
+.faq details p{margin:0 0 14px;font-size:16px}
+.src{font-size:13px;color:var(--sub);border-left:3px solid var(--y);padding-left:10px;margin-top:28px}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "帰省ドライブのガソリン代と高速代はどう割る？", "acceptedAnswer": {"@type": "Answer", "text": "ガソリン代と高速代を合計して、乗った人数で割るのが基本です。途中で降りる人は乗った距離の分だけ負担します。片道300kmを往復して3人で割ると、ガソリン代は約6,800円で1人約2,300円（100円単位の切り上げ）です。"}}, {"@type": "Question", "name": "途中で降りる人がいるときは？", "acceptedAnswer": {"@type": "Answer", "text": "区間ごとに分けて計算し、それぞれの区間に乗っていた人で割ります。ガソ割の「途中でも給油した」機能で区間を分けて入力できます。"}}, {"@type": "Question", "name": "行きだけ乗る人がいるときは？", "acceptedAnswer": {"@type": "Answer", "text": "往復ではなく片道として計算し、行きと帰りで人数を変えて2回計算すると分かりやすいです。"}}, {"@type": "Question", "name": "年末年始もETCの休日割引は使える？", "acceptedAnswer": {"@type": "Answer", "text": "年末年始などの混雑期には、休日割引が適用されない年があります。出発前に道路会社の発表を確認してください。"}}]}</script>
 </head>
 <body>
 <header class="top"><a class="logo" href="./">ガソ<span>割</span></a><nav><a href="articles.html">読みもの</a><a class="go" href="./">計算する</a></nav></header>
@@ -84,14 +94,9 @@ footer a{display:inline-block;min-height:40px;padding:8px}
 <article>
 <p class="crumb"><a href="articles.html">読みもの</a> ＞ 記事</p>
 <h1>年末年始の帰省ドライブ、ガソリン代と高速代はどう割る？</h1>
-<p class="date">2026年11月22日</p>
+<p class="date">公開 2026年11月27日 ・ 更新 2026年11月28日 ・ ガソ割運営</p>
+<div class="answer"><p class="q">帰省ドライブのガソリン代と高速代はどう割る？</p><p>ガソリン代と高速代を合計して、乗った人数で割るのが基本です。途中で降りる人は乗った距離の分だけ負担します。片道300kmを往復して3人で割ると、ガソリン代は約6,800円で1人約2,300円（100円単位の切り上げ）です。</p></div>
 <p class="lead">年末年始、地元が同じ友だちや兄弟と車に乗り合わせて帰省する人も多いはず。長距離になる帰省は、ガソリン代も高速代も金額が大きくなるので、出発前に分け方を決めておくのがおすすめです。</p>
-<div class="box">
-<p><b>この記事のまとめ</b></p>
-<p>・ガソリン代と高速代を合計して、乗った人数で割るのが基本</p>
-<p>・途中で降りる人は「乗った距離の分だけ」負担するのが公平</p>
-<p>・年末年始は渋滞で燃費が落ちやすいので、少し多めに見積もる</p>
-</div>
 <h2>計算例：片道300kmを3人で帰省</h2>
 <div class="box">
 <p>距離：往復600km／燃費：15km/L／単価：170円/L／人数：3人</p>
@@ -115,6 +120,7 @@ footer a{display:inline-block;min-height:40px;padding:8px}
 <h2>まとめ</h2>
 <p>帰省ドライブは距離が長いぶん、割り勘の金額も大きくなります。ガソリン代と高速代を合計して人数で割る、途中で降りる人は乗った距離の分だけ、というルールを出発前に決めておけば、気持ちよく新年を迎えられます。</p>
 <a class="cta" href="./">ガソ割を開く（無料・インストール不要）</a>
+<p class="src">計算の前提と出典：ガソリン単価は資源エネルギー庁「石油製品価格調査」（2026年11月16日調査）のレギュラー都道府県平均をもとにしています。計算結果は目安です。</p><section class="faq"><h2>よくある質問</h2><details><summary>途中で降りる人がいるときは？</summary><p>区間ごとに分けて計算し、それぞれの区間に乗っていた人で割ります。ガソ割の「途中でも給油した」機能で区間を分けて入力できます。</p></details><details><summary>行きだけ乗る人がいるときは？</summary><p>往復ではなく片道として計算し、行きと帰りで人数を変えて2回計算すると分かりやすいです。</p></details><details><summary>年末年始もETCの休日割引は使える？</summary><p>年末年始などの混雑期には、休日割引が適用されない年があります。出発前に道路会社の発表を確認してください。</p></details></section>
 <section class="related"><h2>あわせて読みたい</h2><a href="toll-split.html">高速代・駐車場代の割り勘はどうする？</a><a href="driver-pay.html">ドライブのガソリン代、運転手は払う？</a><a href="gas-cost-formula.html">ガソリン代の計算方法</a></section>
 </article>
 </main>

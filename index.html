@@ -109,6 +109,12 @@ a{color:inherit}
 .pr a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;color:#f5f5f0;font-weight:700;text-decoration:none}
 .pr a::after{content:"→";color:var(--lcd)}
 .pr img.px{position:absolute;width:1px;height:1px;opacity:0}
+.faqs h2{font:400 26px/1.3 "Dela Gothic One",sans-serif;margin:0 0 6px}
+.faqs .lead2{color:var(--sub);margin:0 0 14px;font-size:15px}
+.faqs details{border-bottom:1px solid var(--line);max-width:760px}
+.faqs summary{cursor:pointer;min-height:52px;display:flex;align-items:center;font-weight:800;line-height:1.5;padding:8px 0}
+.faqs summary::marker{color:var(--red)}
+.faqs details p{margin:0 0 14px;color:var(--ink)}
 .bar{display:none}
 footer{font-size:13px;color:var(--sub);border-top:1px solid var(--line)}
 footer p{margin:4px 0;max-width:70ch}
@@ -118,6 +124,7 @@ footer p{margin:4px 0;max-width:70ch}
  body{padding-bottom:76px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "ガソ割は無料で使える？", "acceptedAnswer": {"@type": "Answer", "text": "無料です。会員登録もアプリのインストールも不要で、スマホやPCのブラウザで開けばすぐ使えます。"}}, {"@type": "Question", "name": "ガソリン代の割り勘はどう計算している？", "acceptedAnswer": {"@type": "Answer", "text": "「距離 ÷ 燃費 × 単価」でガソリン代を出し、高速代と駐車場代を足して人数で割ります。1人あたりは1円・10円・100円単位で切り上げられます。"}}, {"@type": "Question", "name": "距離はどうやって出す？", "acceptedAnswer": {"@type": "Answer", "text": "出発地と目的地（経由地も可）を入れると、Googleマップのルート検索で道路に沿った距離を自動で計算します。距離を直接入力することもできます。"}}, {"@type": "Question", "name": "ガソリン単価はどこのデータ？", "acceptedAnswer": {"@type": "Answer", "text": "資源エネルギー庁「石油製品価格調査」（2026年11月16日調査）のレギュラー都道府県平均を使っています。給油レシートの単価に書き換えることもできます。"}}, {"@type": "Question", "name": "運転手を割り勘から外せる？", "acceptedAnswer": {"@type": "Answer", "text": "「ドライバーは払わない」スイッチをオンにすると、運転手以外の人数で割った金額を出します。"}}, {"@type": "Question", "name": "途中で給油した場合は？", "acceptedAnswer": {"@type": "Answer", "text": "「途中でも給油した」をオンにすると、区間ごとに給油した場所の単価で計算して合計します。"}}]}</script>
 </head>
 <body>
 <header class="band"><div class="wrap">
@@ -226,6 +233,7 @@ footer p{margin:4px 0;max-width:70ch}
 
 <div class="bar"><span>1人 <b id="barv">0円</b></span><a href="#res">内訳を見る</a></div>
 
+<section class="band faqs" id="faq"><div class="wrap"><h2>よくある質問</h2><p class="lead2">ガソ割の計算方法とデータについて（2026年11月28日更新）</p><details><summary>ガソ割は無料で使える？</summary><p>無料です。会員登録もアプリのインストールも不要で、スマホやPCのブラウザで開けばすぐ使えます。</p></details><details><summary>ガソリン代の割り勘はどう計算している？</summary><p>「距離 ÷ 燃費 × 単価」でガソリン代を出し、高速代と駐車場代を足して人数で割ります。1人あたりは1円・10円・100円単位で切り上げられます。</p></details><details><summary>距離はどうやって出す？</summary><p>出発地と目的地（経由地も可）を入れると、Googleマップのルート検索で道路に沿った距離を自動で計算します。距離を直接入力することもできます。</p></details><details><summary>ガソリン単価はどこのデータ？</summary><p>資源エネルギー庁「石油製品価格調査」（2026年11月16日調査）のレギュラー都道府県平均を使っています。給油レシートの単価に書き換えることもできます。</p></details><details><summary>運転手を割り勘から外せる？</summary><p>「ドライバーは払わない」スイッチをオンにすると、運転手以外の人数で割った金額を出します。</p></details><details><summary>途中で給油した場合は？</summary><p>「途中でも給油した」をオンにすると、区間ごとに給油した場所の単価で計算して合計します。</p></details></div></section>
 <footer class="band"><div class="wrap">
   <p><a href="articles.html">読みもの：ドライブの割り勘・ガソリン代のコツ →</a></p>
   <p><a href="privacy.html">プライバシーポリシー・免責事項</a></p>

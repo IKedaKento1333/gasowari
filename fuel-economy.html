@@ -11,7 +11,7 @@
 <meta property="og:image" content="https://ikedakento1333.github.io/gasowari/ogp.png"><meta name="twitter:card" content="summary_large_image">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-30WBDKY7MS"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-30WBDKY7MS');</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"車の燃費の目安はどれくらい？タイプ別の実燃費と調べ方","datePublished":"2026-11-22","inLanguage":"ja","publisher":{"@type":"Organization","name":"ガソ割"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"車の燃費の目安はどれくらい？タイプ別の実燃費と調べ方","datePublished":"2026-11-22","dateModified":"2026-11-28","inLanguage":"ja","publisher":{"@type":"Organization","name":"ガソ割"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 /* スマホ基準（360px〜）。768px以上で広げる */
@@ -44,7 +44,7 @@ th,td{border-bottom:1px solid var(--line);padding:10px 6px;text-align:left;verti
 th{white-space:nowrap;font-size:13px;color:var(--sub)}td.n{text-align:right;white-space:nowrap}
 div[style*="overflow-x"]{-webkit-overflow-scrolling:touch}
 .cta{display:flex;align-items:center;justify-content:center;min-height:56px;border-radius:16px;background:var(--k);color:var(--y);font-weight:800;font-size:17px;text-decoration:none;margin:28px 0;padding:8px 16px;text-align:center}
-:root:not([data-theme=light]) .cta{outline:2px solid var(--y)}
+:root[data-theme=dark] .cta{outline:2px solid var(--y)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .cta{outline:2px solid var(--y)}}
 .note{font-size:14px;color:var(--sub)}
 .related{margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
 .related h2{background:none;display:block;font-size:17px;margin:0 0 8px}
@@ -76,7 +76,17 @@ footer a{display:inline-block;min-height:40px;padding:8px}
  .dock{left:auto;right:24px;width:360px}
 }
 @media(prefers-reduced-motion:reduce){.dock{transition:none}}
+.answer{border:2px solid var(--k);border-radius:18px;padding:14px 16px;margin:18px 0 8px;background:var(--bg)}
+:root[data-theme=dark] .answer{border-color:var(--y)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .answer{border-color:var(--y)}}
+.answer .q{font-weight:800;margin:0 0 6px;font-size:16px}.answer .q::before{content:"Q. ";color:var(--r)}
+.answer p{margin:0}.answer p+p::before{content:"A. ";font-weight:800;color:var(--r)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;min-height:52px;display:flex;align-items:center;font-weight:800;font-size:16px;line-height:1.5;padding:8px 0}
+.faq summary::marker{color:var(--r)}
+.faq details p{margin:0 0 14px;font-size:16px}
+.src{font-size:13px;color:var(--sub);border-left:3px solid var(--y);padding-left:10px;margin-top:28px}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "車の実燃費の目安はどれくらい？", "acceptedAnswer": {"@type": "Answer", "text": "目安は、軽自動車が約18km/L、コンパクトカーが約17km/L、ハイブリッド車が約23km/L、ミニバンが約12km/L、SUVが約13km/Lです。実燃費はカタログ燃費の7〜8割程度になることが多いです。"}}, {"@type": "Question", "name": "自分の車の燃費を調べるには？", "acceptedAnswer": {"@type": "Answer", "text": "メーターやナビの平均燃費を見るのが手軽です。満タンにして、次の給油時に「走った距離÷入れた量」で計算する満タン法もあります。"}}, {"@type": "Question", "name": "割り勘でカタログ燃費をそのまま使っていい？", "acceptedAnswer": {"@type": "Answer", "text": "カタログ燃費のままだと、実際より安く計算されがちです。0.8をかけると実際に近くなります。"}}, {"@type": "Question", "name": "燃費が少し違うと、金額はどれくらい変わる？", "acceptedAnswer": {"@type": "Answer", "text": "往復200km・単価170円の場合、燃費15km/Lなら約2,267円、12km/Lなら約2,833円で、500円以上の差が出ます。"}}]}</script>
 </head>
 <body>
 <header class="top"><a class="logo" href="./">ガソ<span>割</span></a><nav><a href="articles.html">読みもの</a><a class="go" href="./">計算する</a></nav></header>
@@ -84,7 +94,8 @@ footer a{display:inline-block;min-height:40px;padding:8px}
 <article>
 <p class="crumb"><a href="articles.html">読みもの</a> ＞ 記事</p>
 <h1>車の燃費の目安はどれくらい？タイプ別の実燃費と調べ方</h1>
-<p class="date">2026年11月22日</p>
+<p class="date">公開 2026年11月22日 ・ 更新 2026年11月28日 ・ ガソ割運営</p>
+<div class="answer"><p class="q">車の実燃費の目安はどれくらい？</p><p>目安は、軽自動車が約18km/L、コンパクトカーが約17km/L、ハイブリッド車が約23km/L、ミニバンが約12km/L、SUVが約13km/Lです。実燃費はカタログ燃費の7〜8割程度になることが多いです。</p></div>
 <p class="lead">ガソリン代を計算するときに、いちばん分かりにくいのが「燃費」です。友だちの車だと、なおさら分かりませんよね。車のタイプ別のおおよその目安と、正確に調べる方法をまとめました。</p>
 <h2>タイプ別の実燃費の目安</h2>
 <div style="overflow-x:auto"><table>
@@ -108,6 +119,7 @@ footer a{display:inline-block;min-height:40px;padding:8px}
 <p>往復200km、単価170円で比べると、燃費15km/Lならガソリン代は約2,267円、燃費12km/Lなら約2,833円。燃費が少し違うだけで、500円以上の差が出ます。割り勘のときは、できるだけ実際に近い燃費を使うのが公平です。</p>
 <a class="cta" href="./">車種を選んでガソリン代を計算する →</a>
 <a class="cta" href="./">ガソ割を開く（無料・インストール不要）</a>
+<p class="src">計算の前提と出典：ガソリン単価は資源エネルギー庁「石油製品価格調査」（2026年11月16日調査）のレギュラー都道府県平均をもとにしています。計算結果は目安です。</p><section class="faq"><h2>よくある質問</h2><details><summary>自分の車の燃費を調べるには？</summary><p>メーターやナビの平均燃費を見るのが手軽です。満タンにして、次の給油時に「走った距離÷入れた量」で計算する満タン法もあります。</p></details><details><summary>割り勘でカタログ燃費をそのまま使っていい？</summary><p>カタログ燃費のままだと、実際より安く計算されがちです。0.8をかけると実際に近くなります。</p></details><details><summary>燃費が少し違うと、金額はどれくらい変わる？</summary><p>往復200km・単価170円の場合、燃費15km/Lなら約2,267円、12km/Lなら約2,833円で、500円以上の差が出ます。</p></details></section>
 <section class="related"><h2>あわせて読みたい</h2><a href="driver-pay.html">ドライブのガソリン代、運転手は払う？揉めない決め方3パターン</a><a href="gas-cost-formula.html">ガソリン代の計算方法｜距離・燃費・単価で1人あたりを出す</a><a href="drive-cost-list.html">人気ドライブ先の往復ガソリン代早見表（東京・大阪発）</a></section>
 </article>
 </main>
